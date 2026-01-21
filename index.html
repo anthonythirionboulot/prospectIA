@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent OSINT B2B - Filtre CSV Intelligent</title>
+    <title>Agent OSINT B2B - Filtre CSV SIRENE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid #e2e8f0; }
@@ -16,7 +16,7 @@
     <div class="max-w-6xl mx-auto px-4 py-8">
         <header class="mb-10 text-center">
             <h1 class="text-4xl font-extrabold text-indigo-700 mb-2 italic">Agent IA Prospecteur</h1>
-            <p class="text-slate-500 font-medium">Spécialiste Exports Annuaire des Entreprises (SIRENE)</p>
+            <p class="text-slate-500 font-medium">Analyse avancée des tranches d'effectifs Unité Légale</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -29,47 +29,49 @@
                     </h2>
                     <div id="dropZone" class="drop-zone p-6 rounded-xl text-center cursor-pointer mb-4">
                         <input type="file" id="fileInput" accept=".csv" class="hidden">
-                        <p class="text-xs text-slate-500">Déposez votre export SIRENE</p>
+                        <p class="text-xs text-slate-500">Glissez l'export SIRENE ici</p>
                     </div>
                     <div id="fileStatus" class="hidden p-3 bg-emerald-50 text-emerald-700 text-xs rounded-lg mb-4">
-                        Fichier reconnu : <span id="fileCount" class="font-bold">0</span> lignes.
+                        Fichier chargé avec succès.
                     </div>
 
                     <h2 class="text-lg font-bold mb-4 flex items-center pt-4 border-t">
                         <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                        2. Filtres Précis
+                        2. Configuration du Filtre
                     </h2>
                     
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Département (ex: 54)</label>
-                            <input type="text" id="deptFilter" placeholder="54" class="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Département Etablissement</label>
+                            <input type="text" id="deptFilter" placeholder="ex: 54" class="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Taille d'entreprise</label>
-                            <div class="space-y-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                <label class="flex items-center space-x-3 text-xs cursor-pointer">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Taille (Unité Légale)</label>
+                            <div class="space-y-2 bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs">
+                                <label class="flex items-center space-x-3 cursor-pointer">
                                     <input type="checkbox" name="size" value="PME" class="w-4 h-4 text-indigo-600 rounded" checked>
-                                    <span>PME (10-249 sal.)</span>
+                                    <span>PME (10-249 salariés)</span>
                                 </label>
-                                <label class="flex items-center space-x-3 text-xs cursor-pointer">
+                                <label class="flex items-center space-x-3 cursor-pointer">
                                     <input type="checkbox" name="size" value="ETI" class="w-4 h-4 text-indigo-600 rounded" checked>
-                                    <span>ETI (250-4999 sal.)</span>
+                                    <span>ETI (250-4999 salariés)</span>
                                 </label>
-                                <label class="flex items-center space-x-3 text-xs cursor-pointer">
+                                <label class="flex items-center space-x-3 cursor-pointer">
                                     <input type="checkbox" name="size" value="GE" class="w-4 h-4 text-indigo-600 rounded">
-                                    <span>GE (+5000 sal.)</span>
+                                    <span>Grandes Entreprises (+5000)</span>
                                 </label>
-                                <label class="flex items-center space-x-3 text-xs cursor-pointer border-t pt-2">
-                                    <input type="checkbox" id="includeUnknown" class="w-4 h-4 text-slate-400 rounded">
-                                    <span class="text-slate-500 italic">Inclure tailles inconnues (NN)</span>
-                                </label>
+                                <div class="mt-2 pt-2 border-t border-slate-200">
+                                    <label class="flex items-center space-x-3 cursor-pointer italic text-slate-400">
+                                        <input type="checkbox" id="includeNN" class="w-4 h-4 text-slate-300 rounded">
+                                        <span>Inclure Non Renseignés (NN)</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
                         <button id="processBtn" disabled class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-lg shadow-lg transition-all text-sm">
-                            Filtrer & Rechercher Contacts
+                            Lancer l'Analyse & OSINT
                         </button>
                     </div>
                 </div>
@@ -79,13 +81,13 @@
                 <div id="resultsContainer" class="glass p-6 rounded-2xl shadow-sm min-h-[500px]">
                     <div id="welcomeState" class="text-center py-20">
                         <div class="bg-indigo-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 italic font-serif text-2xl text-indigo-500 font-bold">CSV</div>
-                        <h3 class="text-lg font-medium text-slate-800">Prêt pour l'analyse</h3>
-                        <p class="text-slate-500 max-w-xs mx-auto text-sm">Chargement intelligent des colonnes denominationUniteLegale et codePostalEtablissement.</p>
+                        <h3 class="text-lg font-medium text-slate-800">Prêt pour le traitement</h3>
+                        <p class="text-slate-500 max-w-xs mx-auto text-sm">Analyse ciblée sur <strong>trancheEffectifsUniteLegale</strong> pour garantir que les filiales de grands groupes ne soient pas oubliées.</p>
                     </div>
 
                     <div id="loadingState" class="hidden py-10 text-center space-y-4">
                         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                        <p id="loadingMsg" class="text-indigo-600 font-medium italic text-sm">Recherche des coordonnées...</p>
+                        <p id="loadingMsg" class="text-indigo-600 font-medium italic text-sm">Traitement en cours...</p>
                         <div class="max-w-xs mx-auto bg-slate-100 h-2 rounded-full overflow-hidden">
                             <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
                         </div>
@@ -93,8 +95,8 @@
 
                     <div id="resultsContent" class="hidden space-y-6">
                         <div class="flex justify-between items-center border-b pb-4">
-                            <h2 class="text-xl font-bold text-slate-800"><span id="matchCount">0</span> Entreprises identifiées</h2>
-                            <button id="exportBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-lg font-bold">Exporter l'enrichissement</button>
+                            <h2 class="text-xl font-bold text-slate-800"><span id="matchCount">0</span> Sociétés filtrées</h2>
+                            <button id="exportBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-lg font-bold">Exporter vers Excel/CSV</button>
                         </div>
                         <div id="resultsList" class="space-y-4"></div>
                     </div>
@@ -131,11 +133,11 @@
                 const separator = lines[0].includes(';') ? ';' : ',';
                 const headers = lines[0].split(separator).map(h => h.replace(/["]/g, '').trim());
                 
-                // MAPPING SIRENE - Très précis selon votre fichier
+                // MAPPING PRECIS SUR LES COLONNES UNITE LEGALE
                 const idxNom = headers.findIndex(h => h === 'denominationUniteLegale' || h === 'nomUniteLegale');
                 const idxSiren = headers.findIndex(h => h === 'siren');
                 const idxCp = headers.findIndex(h => h === 'codePostalEtablissement');
-                const idxTranche = headers.findIndex(h => h === 'trancheEffectifsUniteLegale' || h === 'trancheEffectifsEtablissement');
+                const idxTrancheUL = headers.findIndex(h => h === 'trancheEffectifsUniteLegale');
                 const idxCommune = headers.findIndex(h => h === 'libelleCommuneEtablissement');
 
                 allCsvData = lines.slice(1).map(line => {
@@ -145,21 +147,20 @@
                         siren: cols[idxSiren] || "",
                         cp: cols[idxCp] || "",
                         commune: cols[idxCommune] || "",
-                        tranche: cols[idxTranche] || "NN"
+                        trancheUL: cols[idxTrancheUL] || "NN"
                     };
                 }).filter(item => item.nom !== "Inconnu" && item.nom !== "");
 
                 document.getElementById('fileStatus').classList.remove('hidden');
-                document.getElementById('fileCount').innerText = allCsvData.length;
                 processBtn.disabled = false;
             };
             reader.readAsText(file);
         }
 
         async function enrichWithIA(batch) {
-            const listStr = batch.map(e => `${e.nom} à ${e.commune} (${e.cp})`).join(' | ');
-            const systemPrompt = "Tu es un agent expert en OSINT B2B. Trouve le téléphone (format français) et l'email de contact officiel ou du siège.";
-            const userQuery = `Recherche coordonnées : ${listStr}. Réponds strictement en JSON : { "results": [{ "nom": "Nom exact du CSV", "tel": "...", "email": "...", "site": "..." }] }`;
+            const listStr = batch.map(e => `${e.nom} (${e.commune})`).join(' | ');
+            const systemPrompt = "Tu es un agent expert en OSINT B2B. Trouve le téléphone du siège ou de l'agence et l'email de contact.";
+            const userQuery = `Recherche coordonnées pro pour : ${listStr}. Réponds en JSON : { "results": [{ "nom": "...", "tel": "...", "email": "..." }] }`;
 
             try {
                 const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
@@ -181,35 +182,33 @@
         processBtn.onclick = async () => {
             const dept = document.getElementById('deptFilter').value.trim();
             const selectedSizes = Array.from(document.querySelectorAll('input[name="size"]:checked')).map(cb => cb.value);
-            const includeUnknown = document.getElementById('includeUnknown').checked;
+            const includeNN = document.getElementById('includeNN').checked;
 
             const filteredData = allCsvData.filter(ent => {
-                // Filtre département avec sécurité (si le CP est '54000', startsWith('54') marche)
+                // Normalisation CP
                 const sCp = String(ent.cp).padStart(5, '0');
                 const matchDept = dept ? sCp.startsWith(dept) : true;
                 
-                const t = ent.tranche;
+                const t = ent.trancheUL;
                 let matchSize = false;
                 
                 if (t === "NN" || t === "" || t === "null") {
-                    matchSize = includeUnknown;
+                    matchSize = includeNN;
                 } else {
                     const nT = parseInt(t);
-                    // PME : 11 (10-19) à 22 (200-249)
+                    // PME: 11 à 22
                     if (selectedSizes.includes('PME') && nT >= 11 && nT <= 22) matchSize = true;
-                    // ETI : 31 (250-499) à 42 (2000-4999)
+                    // ETI: 31 à 42
                     if (selectedSizes.includes('ETI') && nT >= 31 && nT <= 42) matchSize = true;
-                    // GE : 51+
+                    // GE: 51+
                     if (selectedSizes.includes('GE') && nT >= 51) matchSize = true;
                 }
-
-                if (selectedSizes.length === 0 && !includeUnknown) matchSize = true;
 
                 return matchDept && matchSize;
             });
 
             if (filteredData.length === 0) {
-                alert("Aucune entreprise trouvée. Essayez de cocher 'Inclure tailles inconnues' car beaucoup de grandes entreprises n'ont pas leur effectif renseigné au niveau de l'établissement.");
+                alert("Aucun résultat. Vérifiez vos filtres ou cochez 'Inclure NN'.");
                 return;
             }
 
@@ -219,11 +218,11 @@
             resultsList.innerHTML = '';
             enrichedData = [];
 
-            const batchSize = 2;
+            const batchSize = 3;
             for (let i = 0; i < filteredData.length; i += batchSize) {
                 const batch = filteredData.slice(i, i + batchSize);
                 progressBar.style.width = `${Math.round((i / filteredData.length) * 100)}%`;
-                loadingMsg.innerText = `OSINT : ${i} / ${filteredData.length} entreprises...`;
+                loadingMsg.innerText = `Analyse OSINT en cours : ${i} / ${filteredData.length}...`;
 
                 const results = await enrichWithIA(batch);
                 
@@ -233,15 +232,15 @@
                     enrichedData.push(merged);
                     
                     const card = document.createElement('div');
-                    card.className = "p-4 border border-slate-200 rounded-xl bg-white shadow-sm flex justify-between items-center transition-all hover:border-indigo-300";
+                    card.className = "p-4 border border-slate-200 rounded-xl bg-white shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-3 transition-all hover:border-indigo-400 hover:shadow-md";
                     card.innerHTML = `
-                        <div>
+                        <div class="flex-1">
                             <h4 class="font-bold text-indigo-900 text-sm uppercase">${merged.nom}</h4>
-                            <p class="text-[10px] text-slate-500">${merged.cp} ${merged.commune} | SIREN: ${merged.siren} | Tranche: ${merged.tranche}</p>
-                            <div class="flex gap-4 mt-2 text-[11px]">
-                                <span class="text-indigo-600 font-bold">Tel: ${merged.tel || 'Recherche...'}</span>
-                                <span class="text-indigo-600 font-bold">Email: ${merged.email || 'N/A'}</span>
-                            </div>
+                            <p class="text-[10px] text-slate-500 font-medium">${merged.cp} ${merged.commune} • Tranche UL: ${merged.trancheUL}</p>
+                        </div>
+                        <div class="flex flex-col text-[11px] sm:text-right border-l sm:border-l-0 sm:pl-0 pl-4 border-indigo-100">
+                            <span class="text-indigo-600 font-bold">📞 ${merged.tel || '...'}</span>
+                            <span class="text-indigo-600 font-bold">✉️ ${merged.email || 'N/A'}</span>
                         </div>
                     `;
                     resultsList.appendChild(card);
@@ -254,14 +253,14 @@
         };
 
         document.getElementById('exportBtn').onclick = () => {
-            const csvRows = ["Nom;Siren;CP;Commune;Tranche;Telephone;Email;Site"];
+            const csvRows = ["Nom;Siren;CP;Ville;Tranche_UL;Telephone;Email"];
             enrichedData.forEach(e => {
-                csvRows.push(`"${e.nom}";"${e.siren}";"${e.cp}";"${e.commune}";"${e.tranche}";"${e.tel || ''}";"${e.email || ''}";"${e.site || ''}"`);
+                csvRows.push(`"${e.nom}";"${e.siren}";"${e.cp}";"${e.commune}";"${e.trancheUL}";"${e.tel || ''}";"${e.email || ''}"`);
             });
-            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob(["\uFEFF" + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "prospection_enrichie.csv";
+            link.download = "extraction_prospects.csv";
             link.click();
         };
     </script>

@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent OSINT B2B - Filtre CSV SIRENE</title>
+    <title>Agent OSINT B2B - Méthodologie Stricte</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid #e2e8f0; }
         .drop-zone { border: 2px dashed #cbd5e1; transition: all 0.3s ease; }
         .drop-zone.active { border-color: #6366f1; background: #f8fafc; }
+        .result-card { border-left: 4px solid #6366f1; transition: transform 0.2s; }
+        .result-card:hover { transform: translateX(5px); }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen font-sans text-slate-900">
@@ -16,62 +18,60 @@
     <div class="max-w-6xl mx-auto px-4 py-8">
         <header class="mb-10 text-center">
             <h1 class="text-4xl font-extrabold text-indigo-700 mb-2 italic">Agent IA Prospecteur</h1>
-            <p class="text-slate-500 font-medium">Analyse avancée des tranches d'effectifs Unité Légale</p>
+            <p class="text-slate-500 font-medium uppercase tracking-widest text-xs">Méthodologie OSINT B2B Certifiée</p>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <aside class="lg:col-span-1 space-y-6">
                 <div class="glass p-6 rounded-2xl shadow-sm border-t-4 border-t-indigo-500">
-                    <h2 class="text-lg font-bold mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h13m-13 4h13m-13 4h13"></path></svg>
-                        1. Charger le CSV
+                    <h2 class="text-lg font-bold mb-4 flex items-center text-indigo-900">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h13m-13 4h13m-13 4h13"></path></svg>
+                        Fichier SIRENE
                     </h2>
                     <div id="dropZone" class="drop-zone p-6 rounded-xl text-center cursor-pointer mb-4">
                         <input type="file" id="fileInput" accept=".csv" class="hidden">
-                        <p class="text-xs text-slate-500">Glissez l'export SIRENE ici</p>
+                        <p class="text-xs text-slate-500">Glissez l'export .csv ici</p>
                     </div>
                     <div id="fileStatus" class="hidden p-3 bg-emerald-50 text-emerald-700 text-xs rounded-lg mb-4">
-                        Fichier chargé avec succès.
+                        <span id="fileCount">0</span> lignes détectées.
                     </div>
 
-                    <h2 class="text-lg font-bold mb-4 flex items-center pt-4 border-t">
-                        <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                        2. Configuration du Filtre
+                    <h2 class="text-lg font-bold mb-4 flex items-center pt-4 border-t text-indigo-900">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                        Ciblage
                     </h2>
                     
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Département Etablissement</label>
-                            <input type="text" id="deptFilter" placeholder="ex: 54" class="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Département (Etab.)</label>
+                            <input type="text" id="deptFilter" placeholder="54" class="w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Taille (Unité Légale)</label>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Effectifs (Unité Légale)</label>
                             <div class="space-y-2 bg-slate-50 p-3 rounded-lg border border-slate-100 text-xs">
                                 <label class="flex items-center space-x-3 cursor-pointer">
                                     <input type="checkbox" name="size" value="PME" class="w-4 h-4 text-indigo-600 rounded" checked>
-                                    <span>PME (10-249 salariés)</span>
+                                    <span>PME (10-249)</span>
                                 </label>
                                 <label class="flex items-center space-x-3 cursor-pointer">
                                     <input type="checkbox" name="size" value="ETI" class="w-4 h-4 text-indigo-600 rounded" checked>
-                                    <span>ETI (250-4999 salariés)</span>
+                                    <span>ETI (250-4999)</span>
                                 </label>
                                 <label class="flex items-center space-x-3 cursor-pointer">
                                     <input type="checkbox" name="size" value="GE" class="w-4 h-4 text-indigo-600 rounded">
-                                    <span>Grandes Entreprises (+5000)</span>
+                                    <span>GE (+5000)</span>
                                 </label>
-                                <div class="mt-2 pt-2 border-t border-slate-200">
-                                    <label class="flex items-center space-x-3 cursor-pointer italic text-slate-400">
-                                        <input type="checkbox" id="includeNN" class="w-4 h-4 text-slate-300 rounded">
-                                        <span>Inclure Non Renseignés (NN)</span>
-                                    </label>
-                                </div>
+                                <label class="flex items-center space-x-3 cursor-pointer pt-2 border-t mt-2">
+                                    <input type="checkbox" id="includeNN" class="w-4 h-4 text-slate-400 rounded">
+                                    <span class="text-slate-400 italic">Inclure tailles NN</span>
+                                </label>
                             </div>
                         </div>
 
-                        <button id="processBtn" disabled class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-lg shadow-lg transition-all text-sm">
-                            Lancer l'Analyse & OSINT
+                        <button id="processBtn" disabled class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-lg shadow-lg transition-all text-sm uppercase tracking-wide">
+                            Rechercher & Vérifier
                         </button>
                     </div>
                 </div>
@@ -79,24 +79,39 @@
 
             <main class="lg:col-span-2">
                 <div id="resultsContainer" class="glass p-6 rounded-2xl shadow-sm min-h-[500px]">
+                    
+                    <!-- Etat Initial -->
                     <div id="welcomeState" class="text-center py-20">
-                        <div class="bg-indigo-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 italic font-serif text-2xl text-indigo-500 font-bold">CSV</div>
-                        <h3 class="text-lg font-medium text-slate-800">Prêt pour le traitement</h3>
-                        <p class="text-slate-500 max-w-xs mx-auto text-sm">Analyse ciblée sur <strong>trancheEffectifsUniteLegale</strong> pour garantir que les filiales de grands groupes ne soient pas oubliées.</p>
+                        <div class="bg-indigo-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-indigo-500">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Prêt pour l'OSINT</h3>
+                        <p class="text-slate-500 max-w-md mx-auto text-sm leading-relaxed">L'agent va croiser les données de <strong>Pappers, Societe.com, Google Maps</strong> et les <strong>sites officiels</strong> pour extraire les contacts vérifiés.</p>
                     </div>
 
-                    <div id="loadingState" class="hidden py-10 text-center space-y-4">
-                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                        <p id="loadingMsg" class="text-indigo-600 font-medium italic text-sm">Traitement en cours...</p>
+                    <!-- Etat de Chargement -->
+                    <div id="loadingState" class="hidden py-10 text-center space-y-6">
+                        <div class="relative w-20 h-20 mx-auto">
+                            <div class="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
+                            <div class="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+                        </div>
+                        <div class="space-y-2">
+                            <p id="loadingMsg" class="text-indigo-700 font-bold italic">Analyse des sources institutionnelles...</p>
+                            <p class="text-xs text-slate-400">Recoupement avec les bases Sirene & Infogreffe</p>
+                        </div>
                         <div class="max-w-xs mx-auto bg-slate-100 h-2 rounded-full overflow-hidden">
                             <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
                         </div>
                     </div>
 
+                    <!-- Etat Résultats -->
                     <div id="resultsContent" class="hidden space-y-6">
-                        <div class="flex justify-between items-center border-b pb-4">
-                            <h2 class="text-xl font-bold text-slate-800"><span id="matchCount">0</span> Sociétés filtrées</h2>
-                            <button id="exportBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-lg font-bold">Exporter vers Excel/CSV</button>
+                        <div class="flex justify-between items-center border-b pb-6">
+                            <div>
+                                <h2 class="text-2xl font-black text-slate-800"><span id="matchCount" class="text-indigo-600">0</span> Prospects trouvés</h2>
+                                <p class="text-xs text-slate-400 mt-1">Données extraites selon la méthodologie B2B</p>
+                            </div>
+                            <button id="exportBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-6 py-3 rounded-xl font-bold shadow-md transition-all">Exporter CSV enrichi</button>
                         </div>
                         <div id="resultsList" class="space-y-4"></div>
                     </div>
@@ -133,7 +148,6 @@
                 const separator = lines[0].includes(';') ? ';' : ',';
                 const headers = lines[0].split(separator).map(h => h.replace(/["]/g, '').trim());
                 
-                // MAPPING PRECIS SUR LES COLONNES UNITE LEGALE
                 const idxNom = headers.findIndex(h => h === 'denominationUniteLegale' || h === 'nomUniteLegale');
                 const idxSiren = headers.findIndex(h => h === 'siren');
                 const idxCp = headers.findIndex(h => h === 'codePostalEtablissement');
@@ -143,24 +157,36 @@
                 allCsvData = lines.slice(1).map(line => {
                     const cols = line.split(separator).map(c => c.replace(/["]/g, '').trim());
                     return {
-                        nom: cols[idxNom] || "Inconnu",
+                        nom: cols[idxNom] || "",
                         siren: cols[idxSiren] || "",
                         cp: cols[idxCp] || "",
                         commune: cols[idxCommune] || "",
                         trancheUL: cols[idxTrancheUL] || "NN"
                     };
-                }).filter(item => item.nom !== "Inconnu" && item.nom !== "");
+                }).filter(item => item.nom !== "");
 
                 document.getElementById('fileStatus').classList.remove('hidden');
+                document.getElementById('fileCount').innerText = allCsvData.length;
                 processBtn.disabled = false;
             };
             reader.readAsText(file);
         }
 
-        async function enrichWithIA(batch) {
-            const listStr = batch.map(e => `${e.nom} (${e.commune})`).join(' | ');
-            const systemPrompt = "Tu es un agent expert en OSINT B2B. Trouve le téléphone du siège ou de l'agence et l'email de contact.";
-            const userQuery = `Recherche coordonnées pro pour : ${listStr}. Réponds en JSON : { "results": [{ "nom": "...", "tel": "...", "email": "..." }] }`;
+        async function osintSearchBatch(batch) {
+            const listStr = batch.map(e => `${e.nom} (${e.commune}, SIREN ${e.siren})`).join(' | ');
+            
+            const systemPrompt = `Tu es un agent expert en OSINT B2B. Tu dois trouver les coordonnées de contact (Téléphone et Email) de manière STRICTE.
+            SOURCES OBLIGATOIRES : Pappers, Societe.com, Infogreffe, Google Maps, Pages Jaunes et sites officiels.
+            
+            RÈGLES STRICTES :
+            1. Ne jamais inventer d'email ou de téléphone.
+            2. Si non trouvé, indique "Information non trouvée dans les sources publiques vérifiables".
+            3. Retourne toujours la source de l'information (ex: "Google Maps" ou "Site Officiel").
+            4. Le téléphone doit être au format français.`;
+
+            const userQuery = `Recherche et recoupement OSINT pour ces entreprises : ${listStr}. 
+            Réponds strictement au format JSON : 
+            { "results": [{ "nom_saisi": "...", "tel": "...", "email": "...", "source": "..." }] }`;
 
             try {
                 const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
@@ -176,7 +202,10 @@
                 const data = await resp.json();
                 const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
                 return JSON.parse(content || '{}').results || [];
-            } catch (e) { return []; }
+            } catch (e) { 
+                console.error("Erreur API:", e);
+                return []; 
+            }
         }
 
         processBtn.onclick = async () => {
@@ -185,10 +214,8 @@
             const includeNN = document.getElementById('includeNN').checked;
 
             const filteredData = allCsvData.filter(ent => {
-                // Normalisation CP
                 const sCp = String(ent.cp).padStart(5, '0');
                 const matchDept = dept ? sCp.startsWith(dept) : true;
-                
                 const t = ent.trancheUL;
                 let matchSize = false;
                 
@@ -196,19 +223,15 @@
                     matchSize = includeNN;
                 } else {
                     const nT = parseInt(t);
-                    // PME: 11 à 22
                     if (selectedSizes.includes('PME') && nT >= 11 && nT <= 22) matchSize = true;
-                    // ETI: 31 à 42
                     if (selectedSizes.includes('ETI') && nT >= 31 && nT <= 42) matchSize = true;
-                    // GE: 51+
                     if (selectedSizes.includes('GE') && nT >= 51) matchSize = true;
                 }
-
                 return matchDept && matchSize;
             });
 
             if (filteredData.length === 0) {
-                alert("Aucun résultat. Vérifiez vos filtres ou cochez 'Inclure NN'.");
+                alert("Aucune entreprise ne correspond à ces filtres. Essayez d'inclure les tailles 'NN'.");
                 return;
             }
 
@@ -218,29 +241,47 @@
             resultsList.innerHTML = '';
             enrichedData = [];
 
-            const batchSize = 3;
+            const batchSize = 2; // Réduit pour plus de précision par appel
             for (let i = 0; i < filteredData.length; i += batchSize) {
                 const batch = filteredData.slice(i, i + batchSize);
                 progressBar.style.width = `${Math.round((i / filteredData.length) * 100)}%`;
-                loadingMsg.innerText = `Analyse OSINT en cours : ${i} / ${filteredData.length}...`;
+                loadingMsg.innerText = `OSINT : Analyse de ${batch[0].nom}...`;
 
-                const results = await enrichWithIA(batch);
+                const results = await osintSearchBatch(batch);
                 
                 batch.forEach(ent => {
-                    const extra = results.find(r => ent.nom.toLowerCase().includes(r.nom.toLowerCase()) || r.nom.toLowerCase().includes(ent.nom.toLowerCase())) || {};
-                    const merged = { ...ent, ...extra };
+                    // Matcher le résultat de l'IA avec l'entité du CSV
+                    const osint = results.find(r => 
+                        ent.nom.toLowerCase().includes(String(r.nom_saisi).toLowerCase()) || 
+                        String(r.nom_saisi).toLowerCase().includes(ent.nom.toLowerCase())
+                    ) || { tel: "Information non trouvée dans les sources publiques vérifiables", email: "Information non trouvée dans les sources publiques vérifiables", source: "Aucune source fiable" };
+                    
+                    const merged = { ...ent, ...osint };
                     enrichedData.push(merged);
                     
                     const card = document.createElement('div');
-                    card.className = "p-4 border border-slate-200 rounded-xl bg-white shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-3 transition-all hover:border-indigo-400 hover:shadow-md";
+                    card.className = "result-card p-5 bg-white rounded-xl shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4";
                     card.innerHTML = `
                         <div class="flex-1">
-                            <h4 class="font-bold text-indigo-900 text-sm uppercase">${merged.nom}</h4>
-                            <p class="text-[10px] text-slate-500 font-medium">${merged.cp} ${merged.commune} • Tranche UL: ${merged.trancheUL}</p>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-black text-slate-800 text-sm uppercase">${merged.nom}</h4>
+                                <span class="bg-indigo-50 text-indigo-600 text-[9px] font-bold px-2 py-0.5 rounded uppercase">Tranche UL: ${merged.trancheUL}</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 font-medium">${merged.cp} ${merged.commune} • SIREN: ${merged.siren}</p>
+                            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div class="bg-slate-50 p-2 rounded-lg">
+                                    <span class="block text-[9px] text-slate-400 uppercase font-bold mb-0.5">📞 Téléphone</span>
+                                    <span class="text-[11px] font-bold ${merged.tel.includes('non trouvée') ? 'text-slate-400 font-normal' : 'text-indigo-600'}">${merged.tel}</span>
+                                </div>
+                                <div class="bg-slate-50 p-2 rounded-lg">
+                                    <span class="block text-[9px] text-slate-400 uppercase font-bold mb-0.5">✉️ Email</span>
+                                    <span class="text-[11px] font-bold ${merged.email.includes('non trouvée') ? 'text-slate-400 font-normal' : 'text-indigo-600'}">${merged.email}</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex flex-col text-[11px] sm:text-right border-l sm:border-l-0 sm:pl-0 pl-4 border-indigo-100">
-                            <span class="text-indigo-600 font-bold">📞 ${merged.tel || '...'}</span>
-                            <span class="text-indigo-600 font-bold">✉️ ${merged.email || 'N/A'}</span>
+                        <div class="text-right flex flex-col items-end">
+                            <span class="text-[9px] text-slate-400 font-bold uppercase mb-1">Source OSINT</span>
+                            <span class="bg-emerald-50 text-emerald-700 text-[10px] px-3 py-1 rounded-full font-bold border border-emerald-100 italic">${merged.source}</span>
                         </div>
                     `;
                     resultsList.appendChild(card);
@@ -253,14 +294,14 @@
         };
 
         document.getElementById('exportBtn').onclick = () => {
-            const csvRows = ["Nom;Siren;CP;Ville;Tranche_UL;Telephone;Email"];
+            const csvRows = ["Nom;Siren;CP;Ville;Tranche_UL;Telephone;Email;Source_OSINT"];
             enrichedData.forEach(e => {
-                csvRows.push(`"${e.nom}";"${e.siren}";"${e.cp}";"${e.commune}";"${e.trancheUL}";"${e.tel || ''}";"${e.email || ''}"`);
+                csvRows.push(`"${e.nom}";"${e.siren}";"${e.cp}";"${e.commune}";"${e.trancheUL}";"${e.tel}";"${e.email}";"${e.source}"`);
             });
             const blob = new Blob(["\uFEFF" + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "extraction_prospects.csv";
+            link.download = "prospection_b2b_verifiee.csv";
             link.click();
         };
     </script>
